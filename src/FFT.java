@@ -13,20 +13,17 @@ public class FFT
 			throw new IllegalArgumentException("n не делится на 2");
 		}
 
-		//FFT для четных
-		Complex[] half = new Complex[n/2];
+		//Для четных
+		Complex[] even = new Complex[n/2];
+		//Для нечетных
+		Complex[] odd = new Complex[n/2];
 		for (int k = 0; k < n/2; ++k)
 		{
-			half[k] = x[2*k];
+			even[k] = x[2*k];
+			odd[k] = x[2*k + 1];
 		}
-		Complex[] evenFFT = fft(half);
-
-		//Повтор FFT для нечетных
-		for (int k = 0; k < n/2; ++k)
-		{
-			half[k] = x[2*k + 1];
-		}
-		Complex[] oddFFT = fft(half);
+		Complex[] evenFFT = fft(even);
+		Complex[] oddFFT = fft(odd);
 
 		//Объединение
 		Complex[] freqs = new Complex[n];
