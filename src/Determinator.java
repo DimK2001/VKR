@@ -42,7 +42,7 @@ class Determinator
 					recordPoints[index] = freq;
 				}
 			}
-			//Cформируем хэш-тег
+			//Составление хеша
 			long h = hash(recordPoints[0], recordPoints[1], recordPoints[2], recordPoints[3], recordPoints[4]);
 			freqs.add(recordPoints[0] + " " + recordPoints[1] + " " + recordPoints[2] + " " + recordPoints[3] + " " + recordPoints[4]);
 			if (h == 0)
