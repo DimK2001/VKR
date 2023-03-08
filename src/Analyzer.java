@@ -9,6 +9,7 @@ public class Analyzer
 {
 	public Boolean running = false;
 	public int SearchType;
+	public String Result = "Не найдено.";
 	private ISearch search;
 	private AudioFormat getFormat()
 	{
@@ -23,12 +24,12 @@ public class Analyzer
 	{
 		public void run()
 		{
-			ArrayList<String> hashes = new ArrayList<>();
-			ArrayList<String> freqs = new ArrayList<>();
+			ArrayList<String> data = new ArrayList<>();
 			byte[] buffer = new byte[2048];
 			final AudioFormat format = getFormat(); //Заполнить объект класса AudioFormat параметрами
 			DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
 			final TargetDataLine line;
+
 			try
 			{
 				line = (TargetDataLine) AudioSystem.getLine(info);
@@ -51,29 +52,44 @@ public class Analyzer
 			try
 			{
 				System.out.println("searching...");
-				while (running)
-				{
-					int count = line.read(buffer, 0, buffer.length);
-					if (count > 0)
-					{
-						out.write(buffer, 0, count);
-					}
-					Complex[][] results = Transform(out);
-
-					Determinator determinator = new Determinator();
-					ArrayList<String>[] determinatedData = determinator.Determinate(results);
-					hashes = determinatedData[0];
-					freqs = determinatedData[1];
-				}
-				out.close();
-
-				//TODO: search
 				switch (SearchType)
 				{
-					case 0 -> search = new FastSearch();
-					case 1 -> search = new DistanceSearch();
+					case 0 :
+						search = new FastSearch();
+						while (running)
+						{
+							int count = line.read(buffer, 0, buffer.length);
+							if (count > 0)
+							{
+								out.write(buffer, 0, count);
+							}
+							Complex[][] results = Transform(out);
+
+							Determinator determinator = new Determinator();
+							ArrayList<String>[] determinatedData = determinator.Determinate(results);
+							data = determinatedData[0];
+						}
+						out.close();
+						break;
+					case 1 :
+						search = new DistanceSearch();
+						while (running)
+						{
+							int count = line.read(buffer, 0, buffer.length);
+							if (count > 0)
+							{
+								out.write(buffer, 0, count);
+							}
+							Complex[][] results = Transform(out);
+
+							Determinator determinator = new Determinator();
+							ArrayList<String>[] determinatedData = determinator.Determinate(results);
+							data = determinatedData[1];
+						}
+						out.close();
+						break;
 				}
-				//search.search()
+				Result = search.search(data);
 			}
 			catch (IOException e)
 			{
