@@ -1,22 +1,26 @@
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
 public class DistanceSearch implements ISearch
 {
+	private long Distance = 10000000;
 	private long countDistance(long x, long y)
 	{
 		return (long) Math.sqrt(Math.abs(x - y));
 	}
 	@Override
-	public String search(ArrayList<String> data)
+	public String search(ArrayList<String> data) throws IOException
 	{
+		File file = new File(".\\DB");
+		String[] db = file.list();
 		int found = 0;
-		long distance = 10000000;
 		for (int i = 0; i < Objects.requireNonNull(db).length; ++i)
 		{
 			Path pathFr = Paths.get(".\\DB\\" + db[i]);
@@ -27,60 +31,52 @@ public class DistanceSearch implements ISearch
 			}
 			catch (IOException e)
 			{
-				throw new RuntimeException(e);
+				throw new Error(e);
 			}
-			try
+			if (Files.lines(pathFr).count() > data.size())
 			{
-				if (Files.lines(pathFr).count() > data.size())
+				for (int j = 0; j < Files.lines(pathFr).count() - data.size(); ++j)
 				{
-					for (int j = 0; j < Files.lines(pathFr).count() - data.size(); ++j)
+					int dist = find(readFr, data, j);
+					if (dist < Distance)
 					{
-						int dS = 0;
-						for (int f = 0; f < data.size(); ++f)
-						{
-							String[] wordsF = data.get(f).split("\\s+");
-							String[] wordsR = readFr.get(f + j).split("\\s+");
-							for (int k = 0; k < 5; ++k)
-							{
-								dS += countDistance(Long.parseLong(wordsF[k]), Long.parseLong(wordsR[k]));
-							}
-							if (dS > distance)
-							{
-								break;
-							}
-						}
-						if (dS < distance) {
-							found = i;
-							distance = dS;
-						}
-					}
-				}
-				else
-				{
-					for (int j = 0; j < data.size() - Files.lines(pathFr).count(); ++j)
-					{
-						int dS = 0;
-						for (int f = 0; f < readFr.size(); ++f)
-						{
-							String[] wordsF = data.get(f + j).split("\\s+");
-							String[] wordsR = readFr.get(f).split("\\s+");
-							for (int k = 0; k < 5; ++k)
-							{
-								dS += countDistance(Long.parseLong(wordsF[k]), Long.parseLong(wordsR[k]));
-							}
-						}
-						if (dS < distance) {
-							found = i;
-							distance = dS;
-						}
+						found = i;
+						Distance = dist;
 					}
 				}
 			}
-			catch (IOException e)
+			else
 			{
-				throw new RuntimeException(e);
+				for (int j = 0; j < data.size() - Files.lines(pathFr).count(); ++j)
+				{
+					int dist = find(data, readFr, j);
+					if (dist < Distance)
+					{
+						found = i;
+						Distance = dist;
+					}
+				}
 			}
 		}
 		return db[found];
+	}
+
+	public int find(List<String> dataBig, List<String> dataSmall, int j)
+	{
+		int res = 0;
+		for (int f = 0; f < dataSmall.size(); ++f)
+		{
+			String[] wordsS = dataSmall.get(f).split("\\s+");
+			String[] wordsB = dataBig.get(f + j).split("\\s+");
+			for (int k = 0; k < 5; ++k)
+			{
+				res += countDistance(Long.parseLong(wordsS[k]), Long.parseLong(wordsB[k]));
+			}
+			if (res > Distance)
+			{
+				break;
+			}
+		}
+		return res;
 	}
 }

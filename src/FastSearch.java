@@ -42,15 +42,15 @@ public class FastSearch implements ISearch
 		}
 		return db[found];
 	}
-	private HashMap<String, Integer> find(ArrayList<String> data, List<String> readHash)
+	public HashMap<String, Integer> find(ArrayList<String> data, List<String> readData)
 	{
 		////////////////////////////////////////////////////////// Быстрый поиск по смещению
 		HashMap<String, Integer> offset = new HashMap<>();
-		for (int j = 0; j < readHash.size(); ++j)
+		for (int j = 0; j < readData.size(); ++j)
 		{
 			for (int k = 0; k < data.size(); ++k)
 			{
-				if (readHash.get(j).equals(data.get(k)))
+				if (readData.get(j).equals(data.get(k)))
 				{
 					if (!offset.containsKey(String.valueOf(j - k)))
 					{
