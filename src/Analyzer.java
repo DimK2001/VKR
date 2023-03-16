@@ -2,7 +2,12 @@ import com.vm.jcomplex.Complex;
 
 import javax.sound.sampled.*;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Analyzer
@@ -99,6 +104,75 @@ public class Analyzer
 		}
 	};
 
+	public void CreateBase() throws UnsupportedAudioFileException, IOException
+	{
+		ArrayList<String> hashes = new ArrayList<>();
+		ArrayList<String> freqs = new ArrayList<>();
+		//BASE/////////////////////////////////////////////////////////////////
+		final AudioFormat format = getFormat();
+		File musicBase = new File(".\\Music");
+		String[] music = musicBase.list();
+		for (String m : music)
+		{
+			Path path = Paths.get(".\\Music\\" + m);
+			File file = new File(String.valueOf(path));
+			AudioInputStream in = AudioSystem.getAudioInputStream(file);
+			AudioInputStream convert = AudioSystem.getAudioInputStream(format, in);
+			byte[] data = new byte[convert.available()];
+
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			try
+			{
+				int count = convert.read(data, 0, data.length);
+				if (count > 0)
+				{
+					out.write(data, 0, count);
+				}
+				Complex[][] results = Transform(out);
+
+				Determinator determinator = new Determinator();
+				ArrayList<String>[] determinatedData = determinator.Determinate(results);
+				hashes = determinatedData[0];
+				freqs = determinatedData[1];
+				out.close();
+				while (hashes.get(hashes.size() - 1).equals("00000000000"))
+				{
+					hashes.remove(hashes.size() - 1);
+				}
+				while (hashes.get(0).equals("00000000000"))
+				{
+					hashes.remove(0);
+				}
+				path = Paths.get(".\\HashDB\\" + m).normalize();
+				String st = path.toString();
+				int index = st.indexOf(".");
+				String name = st.substring(0, index);
+				System.out.println(name);
+				path = Paths.get(name + ".txt");
+				Files.write(path, hashes, StandardCharsets.UTF_8);
+
+				while (freqs.get(freqs.size() - 1).equals("0 0 0 0 0"))
+				{
+					freqs.remove(freqs.size() - 1);
+				}
+				while (freqs.get(0).equals("0 0 0 0 0"))
+				{
+					freqs.remove(0);
+				}
+				path = Paths.get(".\\DB\\" + m).normalize();
+				index = path.toString().indexOf(".");
+				name = path.toString().substring(0, index);
+				System.out.println(name);
+				path = Paths.get(name + ".txt");
+				Files.write(path, freqs, StandardCharsets.UTF_8);
+			}
+			catch (IOException e)
+			{
+				System.err.println("I/O problems: " + e);
+				System.exit(-1);
+			}
+		}
+	}
 	private Complex[][] Transform(ByteArrayOutputStream out)
 	{
 		byte[] audio = out.toByteArray();
