@@ -108,8 +108,8 @@ public class Analyzer
 	{
 		ArrayList<String> hashes = new ArrayList<>();
 		ArrayList<String> freqs = new ArrayList<>();
-		//BASE/////////////////////////////////////////////////////////////////
 		final AudioFormat format = getFormat();
+		//TODO: data base, not file
 		File musicBase = new File(".\\Music");
 		String[] music = musicBase.list();
 		for (String m : music)
