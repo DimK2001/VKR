@@ -121,57 +121,56 @@ public class Analyzer
 			byte[] data = new byte[convert.available()];
 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			try
+			int count = convert.read(data, 0, data.length);
+			if (count > 0)
 			{
-				int count = convert.read(data, 0, data.length);
-				if (count > 0)
-				{
-					out.write(data, 0, count);
-				}
-				Complex[][] results = Transform(out);
-
-				Determinator determinator = new Determinator();
-				ArrayList<String>[] determinatedData = determinator.Determinate(results);
-				hashes = determinatedData[0];
-				freqs = determinatedData[1];
-				out.close();
-				while (hashes.get(hashes.size() - 1).equals("00000000000"))
-				{
-					hashes.remove(hashes.size() - 1);
-				}
-				while (hashes.get(0).equals("00000000000"))
-				{
-					hashes.remove(0);
-				}
-				path = Paths.get(".\\HashDB\\" + m).normalize();
-				String st = path.toString();
-				int index = st.indexOf(".");
-				String name = st.substring(0, index);
-				System.out.println(name);
-				path = Paths.get(name + ".txt");
-				Files.write(path, hashes, StandardCharsets.UTF_8);
-
-				while (freqs.get(freqs.size() - 1).equals("0 0 0 0 0"))
-				{
-					freqs.remove(freqs.size() - 1);
-				}
-				while (freqs.get(0).equals("0 0 0 0 0"))
-				{
-					freqs.remove(0);
-				}
-				path = Paths.get(".\\DB\\" + m).normalize();
-				index = path.toString().indexOf(".");
-				name = path.toString().substring(0, index);
-				System.out.println(name);
-				path = Paths.get(name + ".txt");
-				Files.write(path, freqs, StandardCharsets.UTF_8);
+				out.write(data, 0, count);
 			}
-			catch (IOException e)
-			{
-				System.err.println("I/O problems: " + e);
-				System.exit(-1);
-			}
+			Complex[][] results = Transform(out);
+
+			Determinator determinator = new Determinator();
+			ArrayList<String>[] determinatedData = optimize(determinator.Determinate(results));
+			out.close();
+			hashes = determinatedData[0];
+			freqs = determinatedData[1];
+
+
+			path = Paths.get(".\\HashDB\\" + m).normalize();
+			String st = path.toString();
+			int index = st.indexOf(".");
+			String name = st.substring(0, index);
+			System.out.println(name);
+			path = Paths.get(name + ".txt");
+			Files.write(path, hashes, StandardCharsets.UTF_8);
+
+
+			path = Paths.get(".\\DB\\" + m).normalize();
+			index = path.toString().indexOf(".");
+			name = path.toString().substring(0, index);
+			System.out.println(name);
+			path = Paths.get(name + ".txt");
+			Files.write(path, freqs, StandardCharsets.UTF_8);
 		}
+	}
+	private ArrayList<String>[] optimize(ArrayList<String>[] data)
+	{
+		while (data[0].get(data[0].size() - 1).equals("00000000000"))
+		{
+			data[0].remove(data[0].size() - 1);
+		}
+		while (data[0].get(0).equals("00000000000"))
+		{
+			data[0].remove(0);
+		}
+		while (data[1].get(data[1].size() - 1).equals("0 0 0 0 0"))
+		{
+			data[1].remove(data[1].size() - 1);
+		}
+		while (data[1].get(0).equals("0 0 0 0 0"))
+		{
+			data[1].remove(0);
+		}
+		return data;
 	}
 	private Complex[][] Transform(ByteArrayOutputStream out)
 	{
