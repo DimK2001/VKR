@@ -61,11 +61,11 @@ public class AutoParam
 		}
 		Complex[][] results = Transform(out);
 		//Call determinate//////////////////////////////////////////////////////////////////
-		ArrayList<String>[] determinatedData = optimize(Determinate(results));
+		ArrayList<String>[] determinatedData = standatrize(Determinate(results));
 		out.close();
 		return determinatedData;
 	}
-	private ArrayList<String>[] optimize(ArrayList<String>[] data)
+	private ArrayList<String>[] standatrize(ArrayList<String>[] data)
 	{
 		while (data[0].get(data[0].size() - 1).equals("00000000000"))
 		{

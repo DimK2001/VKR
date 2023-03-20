@@ -12,7 +12,7 @@ public class DistanceSearch implements ISearch
 	private long Distance = 10000000;
 	private long countDistance(long x, long y)
 	{
-		return (long) Math.sqrt(Math.abs(x - y));
+		return (long)(1 + Math.cbrt(Math.abs(x - y) - 1));
 	}
 	@Override
 	public String search(ArrayList<String> data) throws IOException
