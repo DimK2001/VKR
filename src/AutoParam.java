@@ -17,6 +17,7 @@ public class AutoParam
 	private int[] range = new int[] {30, 32, 34, 36, 38};
 	private String NAME = "nenavist\'";
 	final AudioFormat format = new AudioFormat(44100, 8, 1, true, true);
+	//Сделать переменные по которым будет определяться лучший параметр.
 	public AutoParam() throws UnsupportedAudioFileException, IOException
 	{
 		for (int i = 0; range[0] < DATA.UPPER_LIMIT - 8; i += 2)

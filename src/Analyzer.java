@@ -129,7 +129,7 @@ public class Analyzer
 			Complex[][] results = Transform(out);
 
 			Determinator determinator = new Determinator();
-			ArrayList<String>[] determinatedData = optimize(determinator.Determinate(results));
+			ArrayList<String>[] determinatedData = standatrize(determinator.Determinate(results));
 			out.close();
 			hashes = determinatedData[0];
 			freqs = determinatedData[1];
@@ -152,7 +152,7 @@ public class Analyzer
 			Files.write(path, freqs, StandardCharsets.UTF_8);
 		}
 	}
-	private ArrayList<String>[] optimize(ArrayList<String>[] data)
+	private ArrayList<String>[] standatrize(ArrayList<String>[] data)
 	{
 		while (data[0].get(data[0].size() - 1).equals("00000000000"))
 		{
