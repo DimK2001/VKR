@@ -5,21 +5,30 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.ByteArrayOutputStream;
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AutoParam
 {
 	//Change param
 	private int[] range = new int[] {30, 32, 34, 36, 38};
+	private long distance;
+	private int matches;
+	private int[] bestD = new int[5];
+	private int[] bestF = new int[5];
 	private String NAME = "nenavist\'";
 	final AudioFormat format = new AudioFormat(44100, 8, 1, true, true);
 	//Сделать переменные по которым будет определяться лучший параметр.
 	public AutoParam() throws UnsupportedAudioFileException, IOException
 	{
+		DistanceSearch searchD = new DistanceSearch();
+		FastSearch searchF = new FastSearch();
 		for (int i = 0; range[0] < DATA.UPPER_LIMIT - 8; i += 2)
 		{
 			for (int j = i + 2; range[1] < DATA.UPPER_LIMIT - 6; j += 2)
@@ -42,11 +51,30 @@ public class AutoParam
 							determinatedData = openFile(path);
 							ArrayList<String> hashesTest = determinatedData[0];
 							ArrayList<String> freqsTest = determinatedData[1];
+							for (int line = 0; line < freqsEX.size() - freqsTest.size(); ++line)
+							{
+								long dist = searchD.find(freqsEX, freqsTest, line);
+								if (dist < distance)
+								{
+									bestD = range;
+									distance = dist;
+								}
+							}
+							for (int match : searchF.find(hashesTest, hashesEX).values())
+							{
+								if (match > matches)
+								{
+									matches = match;
+									bestF = range;
+								}
+							}
 						}
 					}
 				}
 			}
 		}
+		System.out.println(Arrays.toString(bestD) + " " + distance);
+		System.out.println(Arrays.toString(bestF) + " " + matches);
 	}
 	private ArrayList<String>[] openFile(Path path) throws UnsupportedAudioFileException, IOException
 	{
@@ -165,5 +193,4 @@ public class AutoParam
 				+ (p2 - (p2 % FUZ_FACTOR)) * 100
 				+ (p1 - (p1 % FUZ_FACTOR)));
 	}
-	//TODO: Search and write distance or matches
 }

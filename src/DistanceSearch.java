@@ -36,7 +36,7 @@ public class DistanceSearch implements ISearch
 			{
 				for (int j = 0; j < Files.lines(pathFr).count() - data.size(); ++j)
 				{
-					int dist = find(readFr, data, j);
+					long dist = find(readFr, data, j);
 					if (dist < Distance)
 					{
 						found = i;
@@ -48,7 +48,7 @@ public class DistanceSearch implements ISearch
 			{
 				for (int j = 0; j < data.size() - Files.lines(pathFr).count(); ++j)
 				{
-					int dist = find(data, readFr, j);
+					long dist = find(data, readFr, j);
 					if (dist < Distance)
 					{
 						found = i;
@@ -60,13 +60,13 @@ public class DistanceSearch implements ISearch
 		return db[found];
 	}
 
-	public int find(List<String> dataBig, List<String> dataSmall, int j)
+	public long find(List<String> dataBig, List<String> dataSmall, int startLine)
 	{
-		int res = 0;
+		long res = 0;
 		for (int f = 0; f < dataSmall.size(); ++f)
 		{
 			String[] wordsS = dataSmall.get(f).split("\\s+");
-			String[] wordsB = dataBig.get(f + j).split("\\s+");
+			String[] wordsB = dataBig.get(f + startLine).split("\\s+");
 			for (int k = 0; k < 5; ++k)
 			{
 				res += countDistance(Long.parseLong(wordsS[k]), Long.parseLong(wordsB[k]));
