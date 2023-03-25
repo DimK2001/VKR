@@ -30,55 +30,39 @@ public class AutoParam
 	{
 		DistanceSearch searchD = new DistanceSearch();
 		FastSearch searchF = new FastSearch();
-		for (int i = 0; range[0] < DATA.UPPER_LIMIT - 80; i += 20)
+		for (int i = 0; range[3] < DATA.UPPER_LIMIT - 10; i += 2)
 		{
-			for (int j = 0; range[1] < DATA.UPPER_LIMIT - 60; j += 20)
+			range = new int[] {30, 50, 70, 320 + i, DATA.UPPER_LIMIT + 1};
+			System.out.println(Arrays.toString(range));
+			//Open file EX/////////////////////////////////////////////////////////////////////
+			Path path = Paths.get(".\\Music\\" + NAME);
+			ArrayList<String>[] determinatedData = openFile(path);
+			ArrayList<String> hashesEX = determinatedData[0];
+			ArrayList<String> freqsEX = determinatedData[1];
+
+			//Open file Test/////////////////////////////////////////////////////////////////////
+			path = Paths.get(".\\Test\\" + NAME);
+			determinatedData = openFile(path);
+			ArrayList<String> hashesTest = determinatedData[0];
+			ArrayList<String> freqsTest = determinatedData[1];
+
+			for (int line = 0; line < freqsEX.size() - freqsTest.size(); ++line)
 			{
-				for (int k = 0; range[2] < DATA.UPPER_LIMIT - 40; k += 20)
+				long dist = searchD.find(freqsEX, freqsTest, line);
+				if (dist < distance)
 				{
-					for (int m = 0; range[3] < DATA.UPPER_LIMIT - 20; m += 20)
-					{
-						range = new int[] {30 + i, 50 + j, 70 + k, 90 + m, DATA.UPPER_LIMIT + 1};
-						System.out.println(Arrays.toString(range));
-						//Open file EX/////////////////////////////////////////////////////////////////////
-						Path path = Paths.get(".\\Music\\" + NAME);
-						ArrayList<String>[] determinatedData = openFile(path);
-						ArrayList<String> hashesEX = determinatedData[0];
-						ArrayList<String> freqsEX = determinatedData[1];
-
-						//Open file Test/////////////////////////////////////////////////////////////////////
-						path = Paths.get(".\\Test\\" + NAME);
-						determinatedData = openFile(path);
-						ArrayList<String> hashesTest = determinatedData[0];
-						ArrayList<String> freqsTest = determinatedData[1];
-
-						long dist = searchD.find(freqsTest, freqsEX, 0);
-						if (dist < distance)
-						{
-							bestD = range;
-							distance = dist;
-							System.out.println(dist + " dist");
-						}
-						/*for (int line = 0; line < freqsEX.size() - freqsTest.size(); ++line)
-						{
-							long dist = searchD.find(freqsEX, freqsTest, line);
-							if (dist < distance)
-							{
-								bestD = range;
-								distance = dist;
-								System.out.println(dist + " dist");
-							}
-						}
-						for (int match : searchF.find(hashesTest, hashesEX).values())
-						{
-							if (match > matches)
-							{
-								matches = match;
-								bestF = range;
-								System.out.println(matches + " match");
-							}
-						}*/
-					}
+					bestD = range;
+					distance = dist;
+					System.out.println(dist + " dist");
+				}
+			}
+			for (int match : searchF.find(hashesTest, hashesEX).values())
+			{
+				if (match > matches)
+				{
+					matches = match;
+					bestF = range;
+					System.out.println(matches + " match");
 				}
 			}
 		}
