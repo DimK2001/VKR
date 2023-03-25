@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.Console;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,64 +18,74 @@ import java.util.Arrays;
 public class AutoParam
 {
 	//Change param
-	private int[] range = new int[] {30, 32, 34, 36, 38};
-	private long distance;
+	private int[] range = new int[] {30, 50, 70, 90, DATA.UPPER_LIMIT + 1};
+	private long distance = 100000000;
 	private int matches;
 	private int[] bestD = new int[5];
 	private int[] bestF = new int[5];
-	private String NAME = "nenavist\'";
+	private String NAME = "Bad Apple.wav";
 	final AudioFormat format = new AudioFormat(44100, 8, 1, true, true);
 	//Сделать переменные по которым будет определяться лучший параметр.
-	public AutoParam() throws UnsupportedAudioFileException, IOException
+	public String[] CountParam() throws UnsupportedAudioFileException, IOException
 	{
 		DistanceSearch searchD = new DistanceSearch();
 		FastSearch searchF = new FastSearch();
-		for (int i = 0; range[0] < DATA.UPPER_LIMIT - 8; i += 2)
+		for (int i = 0; range[0] < DATA.UPPER_LIMIT - 80; i += 20)
 		{
-			for (int j = i + 2; range[1] < DATA.UPPER_LIMIT - 6; j += 2)
+			for (int j = 0; range[1] < DATA.UPPER_LIMIT - 60; j += 20)
 			{
-				for (int k = j + 2; range[2] < DATA.UPPER_LIMIT - 4; k += 2)
+				for (int k = 0; range[2] < DATA.UPPER_LIMIT - 40; k += 20)
 				{
-					for (int m = k + 2; range[3] < DATA.UPPER_LIMIT - 2; m += 2)
+					for (int m = 0; range[3] < DATA.UPPER_LIMIT - 20; m += 20)
 					{
-						for (int l = m + 2; range[4] < DATA.UPPER_LIMIT; l += 2)
-						{
-							range = new int[] {30 + i, 32 + j, 34 + k, 36 + m, 38 + l};
-							//Open file EX/////////////////////////////////////////////////////////////////////
-							Path path = Paths.get(".\\Music\\" + NAME);
-							ArrayList<String>[] determinatedData = openFile(path);
-							ArrayList<String> hashesEX = determinatedData[0];
-							ArrayList<String> freqsEX = determinatedData[1];
+						range = new int[] {30 + i, 50 + j, 70 + k, 90 + m, DATA.UPPER_LIMIT + 1};
+						System.out.println(Arrays.toString(range));
+						//Open file EX/////////////////////////////////////////////////////////////////////
+						Path path = Paths.get(".\\Music\\" + NAME);
+						ArrayList<String>[] determinatedData = openFile(path);
+						ArrayList<String> hashesEX = determinatedData[0];
+						ArrayList<String> freqsEX = determinatedData[1];
 
-							//Open file Test/////////////////////////////////////////////////////////////////////
-							path = Paths.get(".\\TEST\\" + NAME);
-							determinatedData = openFile(path);
-							ArrayList<String> hashesTest = determinatedData[0];
-							ArrayList<String> freqsTest = determinatedData[1];
-							for (int line = 0; line < freqsEX.size() - freqsTest.size(); ++line)
+						//Open file Test/////////////////////////////////////////////////////////////////////
+						path = Paths.get(".\\Test\\" + NAME);
+						determinatedData = openFile(path);
+						ArrayList<String> hashesTest = determinatedData[0];
+						ArrayList<String> freqsTest = determinatedData[1];
+
+						long dist = searchD.find(freqsTest, freqsEX, 0);
+						if (dist < distance)
+						{
+							bestD = range;
+							distance = dist;
+							System.out.println(dist + " dist");
+						}
+						/*for (int line = 0; line < freqsEX.size() - freqsTest.size(); ++line)
+						{
+							long dist = searchD.find(freqsEX, freqsTest, line);
+							if (dist < distance)
 							{
-								long dist = searchD.find(freqsEX, freqsTest, line);
-								if (dist < distance)
-								{
-									bestD = range;
-									distance = dist;
-								}
-							}
-							for (int match : searchF.find(hashesTest, hashesEX).values())
-							{
-								if (match > matches)
-								{
-									matches = match;
-									bestF = range;
-								}
+								bestD = range;
+								distance = dist;
+								System.out.println(dist + " dist");
 							}
 						}
+						for (int match : searchF.find(hashesTest, hashesEX).values())
+						{
+							if (match > matches)
+							{
+								matches = match;
+								bestF = range;
+								System.out.println(matches + " match");
+							}
+						}*/
 					}
 				}
 			}
 		}
-		System.out.println(Arrays.toString(bestD) + " " + distance);
-		System.out.println(Arrays.toString(bestF) + " " + matches);
+		String[] st = new String[2];
+		st[0] = Arrays.toString(bestD) + " " + distance;
+		st[1] = Arrays.toString(bestF) + " " + matches;
+		return st;
 	}
 	private ArrayList<String>[] openFile(Path path) throws UnsupportedAudioFileException, IOException
 	{
