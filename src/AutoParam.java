@@ -18,9 +18,9 @@ import java.util.Arrays;
 public class AutoParam
 {
 	//Change param
-	private int[] range = new int[] {30, 50, 70, 90, DATA.UPPER_LIMIT + 1};
-	private long distance = 100000000;
-	private int matches;
+	private int[] range = new int[] {64, 220, 260, 400, DATA.UPPER_LIMIT + 1};
+	private long distance = 1000000;
+	private int matches = -100000;
 	private int[] bestD = new int[5];
 	private int[] bestF = new int[5];
 	private String NAME = "Bad Apple.wav";
@@ -30,9 +30,9 @@ public class AutoParam
 	{
 		DistanceSearch searchD = new DistanceSearch();
 		FastSearch searchF = new FastSearch();
-		for (int i = 0; range[3] < DATA.UPPER_LIMIT - 10; i += 2)
+		for (int i = 0; range[0] + 10 < 200; i += 1)
 		{
-			range = new int[] {30, 50, 70, 320 + i, DATA.UPPER_LIMIT + 1};
+			range = new int[] {50+i, 220, 260, 400, DATA.UPPER_LIMIT + 1};
 			System.out.println(Arrays.toString(range));
 			//Open file EX/////////////////////////////////////////////////////////////////////
 			Path path = Paths.get(".\\Music\\" + NAME);
@@ -46,23 +46,37 @@ public class AutoParam
 			ArrayList<String> hashesTest = determinatedData[0];
 			ArrayList<String> freqsTest = determinatedData[1];
 
+			path = Paths.get(".\\Test\\" + "krahmal-bol_vsego_mira.wav");
+			determinatedData = openFile(path);
+			ArrayList<String> hashesWrong = determinatedData[0];
+			ArrayList<String> freqsWrong = determinatedData[1];
+
+			long distWr = searchD.find(freqsEX, freqsWrong, 0);
+			int matchesWr = 0;
+			for (int match : searchF.find(hashesWrong, hashesEX).values())
+			{
+				if (match >= matchesWr)
+				{
+					matchesWr = match;
+				}
+			}
 			for (int line = 0; line < freqsEX.size() - freqsTest.size(); ++line)
 			{
 				long dist = searchD.find(freqsEX, freqsTest, line);
-				if (dist < distance)
+				if (dist - distWr <= distance)
 				{
 					bestD = range;
-					distance = dist;
-					System.out.println(dist + " dist");
+					distance = dist - distWr;
+					System.out.println(dist + " dist " + distWr);
 				}
 			}
 			for (int match : searchF.find(hashesTest, hashesEX).values())
 			{
-				if (match > matches)
+				if (match - matchesWr >= matches)
 				{
-					matches = match;
+					matches = match - matchesWr ;
 					bestF = range;
-					System.out.println(matches + " match");
+					System.out.println(match + " match" + matchesWr);
 				}
 			}
 		}
