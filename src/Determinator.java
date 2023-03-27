@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 class Determinator
 {
-	public final int[] RANGE = new int[] { 50, 100, 220, 350, DATA.UPPER_LIMIT+1 };
+	public final int[] RANGE = new int[] { 50, 100, 220, 350, DATA.CHUNK_SIZE +1 };
 	private ArrayList<String> hashes = new ArrayList<>();
 	private ArrayList<String> freqs = new ArrayList<>();
 
@@ -22,12 +22,12 @@ class Determinator
 
 	public ArrayList<String>[] Determinate(Complex[][] results) throws IOException
 	{
-		double[] highscores = new double[DATA.UPPER_LIMIT];
-		int[] recordPoints = new int[DATA.UPPER_LIMIT];
+		double[] highscores = new double[DATA.CHUNK_SIZE];
+		int[] recordPoints = new int[DATA.CHUNK_SIZE];
 
 		for (int i = 0; i < results.length; ++i)
 		{
-			for (int freq = DATA.LOWER_LIMIT; freq < DATA.UPPER_LIMIT - 1; ++freq)
+			for (int freq = DATA.LOWER_LIMIT; freq < DATA.CHUNK_SIZE - 1; ++freq)
 			{
 				//Получим силу сигнала
 				double mag = Math.log(results[i][freq].abs() + 1);
@@ -53,8 +53,8 @@ class Determinator
 			{
 				hashes.add(i, String.valueOf(h));
 			}
-			highscores = new double[DATA.UPPER_LIMIT];
-			recordPoints = new int[DATA.UPPER_LIMIT];
+			highscores = new double[DATA.CHUNK_SIZE];
+			recordPoints = new int[DATA.CHUNK_SIZE];
 		}
 		return new ArrayList[]{hashes, freqs};
 	}
