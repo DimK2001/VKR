@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 class Determinator
 {
-	public final int[] RANGE = new int[] { 50, 100, 220, 350, DATA.CHUNK_SIZE +1 };
+	public final int[] RANGE = new int[] { 64, 220, 260, 400, DATA.CHUNK_SIZE + 1 };
 	private ArrayList<String> hashes = new ArrayList<>();
 	private ArrayList<String> freqs = new ArrayList<>();
 
